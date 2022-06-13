@@ -47,9 +47,6 @@ Store a tensor of double. Data take the following shape
 
 ### Meta Project (3)
 Indicate that the next entry until the next `META_PROJECT` entry are related to the project `project name`.
-
-| project name |
-|:------------:|
-| variable     |
+For this entry `project name` replace the `name` field and size is 0;
 
 If no `META_PROJECT` is present in the file, the entries are considered to belong to the `default` project
