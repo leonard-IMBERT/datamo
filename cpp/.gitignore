@@ -56,3 +56,6 @@ _deps
 
 # Local libtorch
 libtorch
+
+# Build folder build
+build
