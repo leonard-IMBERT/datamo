@@ -28,26 +28,42 @@ struct Item {
 struct ScalarItem : public Item {
   double data;
 
-  std::string name;
-  WritableType type = SCALAR;
-  unsigned long size = 8;
-  void * data_pointer = &data;
-
-  ScalarItem(std::string n, double d) : name(n), data(d) {};
+  ScalarItem(std::string n, double d) : data(d) {
+    name = n;
+    type = SCALAR;
+    size = 8;
+    data_pointer = &data;
+  };
 };
 
 struct TensorItem : public Item {
   torch::Tensor data;
 
-  std::string name;
-  WritableType type = TENSOR;
-  unsigned long size;
-  void * data_pointer = &data;
+  TensorItem(std::string n, torch::Tensor d) {
+    name = n;
+    type = TENSOR;
+    data = d.clone().detach().cpu().to(torch::kFloat64).contiguous();
 
-  TensorItem(std::string n, torch::Tensor d) : name(n), data(d) {
-    data.to(torch::)
+
+    data_pointer = data.data_ptr<double>();
+    size = 1;
+    for(unsigned int order = 0; order < d.sizes().size(); order ++) {
+      size = size * d.size(order);
+    }
+
+    size = size * sizeof(double);
   };
 };
+
+struct MetaProjectItem : public Item {
+  MetaProjectItem(std::string n) {
+    name = n;
+    type = META_PROJECT;
+    size = 0;
+    data_pointer = nullptr;
+  };
+};
+
 
 class Writer {
  private:
