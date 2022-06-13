@@ -59,3 +59,8 @@ libtorch
 
 # Build folder build
 build
+
+# install folders
+include
+lib
+pkgconfig
