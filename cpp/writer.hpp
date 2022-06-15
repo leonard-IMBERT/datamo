@@ -28,11 +28,11 @@ namespace DataMo {
  */
 enum WritableType {
   // Monitoring
-  SCALAR, /**< A simple scalar */
-  TENSOR, /**< A tensor */
+  SCALAR = 0, /**< A simple scalar */
+  TENSOR = 1, /**< A tensor */
 
   // Metadata
-  META_PROJECT, /**< Meta tag that specify the project */
+  META_PROJECT = 2, /**< Meta tag that specify the project */
 };
 
 /**
@@ -78,6 +78,17 @@ struct TensorItem : public Item {
   torch::Tensor data;
 
   /**
+   * @brief Pointer to the order and dims data
+   */
+  int32_t * order_dims;
+
+  /**
+   * @brief
+   *
+   */
+  int order_dims_size;
+
+  /**
    * @brief Construct a new Tensor Item object
    *
    * @param n The name of the item
@@ -90,8 +101,16 @@ struct TensorItem : public Item {
 
 
     data_pointer = data.data_ptr<double>();
+
+    int32_t orders = d.sizes().size();
+
+    order_dims_size = orders + 1;
+    order_dims = new int32_t[orders + 1];
+    order_dims[0] = orders;
+
     size = 1;
-    for(unsigned int order = 0; order < d.sizes().size(); order ++) {
+    for(unsigned int order = 0; order < orders; order ++) {
+      order_dims[order + 1] = d.size(order);
       size = size * d.size(order);
     }
 
@@ -99,6 +118,10 @@ struct TensorItem : public Item {
     // implementation of double by the compiler
     size = size * sizeof(double);
   };
+
+  ~TensorItem() {
+    delete order_dims;
+  }
 };
 
 /**

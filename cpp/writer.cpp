@@ -4,14 +4,14 @@
 
 namespace DataMo {
 Writer::Writer(std::string location) : _out_location(location) {
-  _out_stream = std::ofstream(_out_location + _out_file, std::ios::binary);
+  _out_stream = std::ofstream(_out_location + _out_file, std::ios::binary | std::ios::app);
 }
 
 void Writer::set_out_location(std::string new_loc) {
   _file_lock.lock();
   _out_stream.close();
   _out_location = new_loc;
-  _out_stream = std::ofstream(_out_location + _out_file, std::ios::binary);
+  _out_stream = std::ofstream(_out_location + _out_file, std::ios::binary | std::ios::app);
   _file_lock.unlock();
 }
 
@@ -60,7 +60,21 @@ void Writer::write_data(Item * data) {
   _out_stream.write(name_buffer, 24);
 
   int64_t size = (int64_t) data->size;
+
+  if(data->type == TENSOR) {
+    // special case for the tensor, needs to write the dimensions also
+    TensorItem * dataT = (TensorItem *) data;
+    size += (dataT->order_dims_size * sizeof(int32_t));
+
+  }
   _out_stream.write(reinterpret_cast<char *>(&size), sizeof(int64_t));
+
+  if(data->type == TENSOR) {
+    // special case for the tensor, needs to write the dimensions also
+    TensorItem * dataT = (TensorItem *) data;
+    _out_stream.write(reinterpret_cast<char *>(dataT->order_dims), dataT->order_dims_size * sizeof(int32_t));
+
+  }
 
   _out_stream.write(reinterpret_cast<char *>(data->data_pointer), data->size);
 
