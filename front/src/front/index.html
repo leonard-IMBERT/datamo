@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/ressources/css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300&display=swap" rel="stylesheet">
+  <title>DataMo</title>
+</head>
+<body>
+  <header><h1>DataMo</h1></header>
+  <aside>
+    <div class="selector" id="project-selector">
+      <h2>Select project</h2>
+      <select id="project"></select>
+    </div>
+
+    <div class="selector" id="value-selector">
+      <h2>Value</h2>
+      <select id="value">
+        <option value="" selected disabled hidden>Choose here</option>
+      </select>
+    </div>
+  </aside>
+  <main>
+    <div id="graph">
+      <nav class="graph-selector">
+        <button value="plot" hidden>Plot</button>
+        <button value="hist" hidden>Histogram</button>
+        <button value="tensor-weight" hidden>Tensor weight</button>
+      </nav>
+      <div class="canvas"></div>
+    </div>
+    <div id="raw">
+    </div>
+  </main>
+  <script src="/ressources/js"></script>
+</body>
+</html>
