@@ -1,6 +1,17 @@
 #include "../writer.hpp"
+#include <random>
+#include <cctype>
+
+using u32    = uint_least32_t;
+using engine = std::mt19937;
 
 int main(int argc, char * args[]) {
+  std::random_device os_seed;
+  const u32 seed = os_seed();
+
+  engine generator(seed);
+  std::normal_distribution<double> distribution(0., 1.0);
+
   DataMo::Writer writer("./");
 
   {
@@ -9,7 +20,7 @@ int main(int argc, char * args[]) {
   }
 
   {
-    DataMo::ScalarItem item("Loss", 24.128);
+    DataMo::ScalarItem item("Loss", distribution(generator));
     writer.write_data(&item);
   }
 
@@ -19,12 +30,12 @@ int main(int argc, char * args[]) {
   }
 
   {
-    DataMo::ScalarItem item("Loss", 22.128);
+    DataMo::ScalarItem item("Loss", distribution(generator));
     writer.write_data(&item);
   }
 
   {
-    DataMo::ScalarItem item("Loss", 23.0123);
+    DataMo::ScalarItem item("Loss", distribution(generator));
     writer.write_data(&item);
   }
   {
