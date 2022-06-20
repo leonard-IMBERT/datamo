@@ -249,7 +249,9 @@ export class GraphManager {
             })
             }
           break
-        }
+      }
+
+      this.currentSelection.current_index = data.length
     }
   }
 }
