@@ -18,7 +18,7 @@ endif()
 
 # ================= DataMo ==================
 
-project(DataMo VERSION 0.1.0 DESCRIPTION "Data Monitoring Library")
+project(DataMo VERSION 0.1.1 DESCRIPTION "Data Monitoring Library")
 
 add_library(DataMo STATIC
   writer.cpp
@@ -45,7 +45,7 @@ configure_file(./DataMo.pc.in ./DataMo.pc @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/DataMo.pc DESTINATION ${DataMo_SOURCE_DIR}/pkgconfig)
 
 # =============== Test ===============
-project(DataMoTest VERSION 0.1.0 DESCRIPTION "Testing DataMo")
+project(DataMoTest VERSION 0.1.1 DESCRIPTION "Testing DataMo")
 
 add_executable(DataMoTest test/test.cpp)
 

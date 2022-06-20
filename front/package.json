@@ -1,6 +1,6 @@
 {
   "name": "datamo-front",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The front of DataMo",
   "main": "server.js",
   "scripts": {
