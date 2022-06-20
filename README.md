@@ -3,9 +3,9 @@
 DataMo is a library used to monitor data in real time. It has been originally developped to monitor training data of neural networks in cpp. The language implementation of the writer aim to be thread safe.
 
 An implementation of the writer exist currently for the following languages
- - C++ in the `cpp` folder
+ - C++ in the [`cpp`](cpp/) folder
 
-An web interface to read the data in realtime is developped in python
+An web interface to read the data in realtime is developped in [nodejs](nodejs.org). The implentation is located in the [front](front/) folder
 
 ## Data definition (v0.1)
 
@@ -50,3 +50,7 @@ Indicate that the next entry until the next `META_PROJECT` entry are related to 
 For this entry `project name` replace the `name` field and size is 0;
 
 If no `META_PROJECT` is present in the file, the entries are considered to belong to the `default` project
+
+## Changelog
+ - `0.1.1`
+   - Fix a bug in the cpp writer
