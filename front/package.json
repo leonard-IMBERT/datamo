@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "build": "node_modules/.bin/parcel build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "targets": {
