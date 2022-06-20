@@ -1,11 +1,7 @@
 cmake_minimum_required(VERSION 3.16.4 FATAL_ERROR)
 
-find_package(Clang)
-
-if(DEFINED Clang_FOUND)
-  set(CMAKE_C_COMPILER "/usr/bin/clang")
-  set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
-endif(DEFINED Clang_FOUND)
+set(CMAKE_C_COMPILER "/usr/bin/clang")
+set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
@@ -24,7 +20,7 @@ endif()
 
 project(DataMo VERSION 0.1.0 DESCRIPTION "Data Monitoring Library")
 
-add_library(DataMo SHARED
+add_library(DataMo STATIC
   writer.cpp
 )
 
