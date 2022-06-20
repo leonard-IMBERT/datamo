@@ -12,7 +12,7 @@ An web interface to read the data in realtime is developped in python
 The data of the monitoring are stored in binary file using the `.datamo` extension.
 They are stored following the following scheme
  - A magic string `"DATAMO"`
- - The date and time (DD/MM/YYYY~HH:mm:ss::mmm) encoded on 24 bytes
+ - The date and time (DD/MM/YYYY~HH:mm:ss::mmm) encoded on 24 bytes (the string doesn't have a null terminating character)
  - A data type identifier (see the _DataType_ section) encoded on 2 bytes
  - A name identifier on 24 bytes
  - The size of the stored data in bytes encoded on 8 bytes

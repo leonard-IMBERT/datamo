@@ -39,11 +39,10 @@ void Writer::write_data(Item * data) {
 
   _out_stream.write("DATAMO", 6);
 
-  char time_buffer[24];
-  strftime(time_buffer, 20, "%d/%m/%Y~%T::", localtime(&nowAsTimeT));
-  sprintf(time_buffer + 20, "%03.3d", (int) nowMs.count());
-  time_buffer[23] = ' ';
-
+  char time_buffer[25];
+  strftime(time_buffer, 25, "%d/%m/%Y~%T::", localtime(&nowAsTimeT));
+  sprintf(time_buffer + 21, "%03.3d", (int) nowMs.count());
+  // Exclude the null terminating character
   _out_stream.write(time_buffer, 24);
 
   int16_t type = (int16_t) data->type;

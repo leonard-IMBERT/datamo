@@ -31,6 +31,7 @@ export function DataMoStringToDate(str: string) {
     return date
   }
 
+  console.warn(`Cannot understand the date: ${str}`)
   return new Date(Date.now())
 }
 
