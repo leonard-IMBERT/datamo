@@ -1,4 +1,4 @@
-import { Context, DataMoStringToDate, ReadableType } from "../utils";
+import { Context, DataMoStringToDate, isArrayOf, isTensorDesc, ReadableType, TensorDesc } from "../utils";
 import Plotly from 'plotly.js/dist/plotly'
 import { reshape } from 'mathjs'
 
@@ -14,7 +14,8 @@ function isGM(str: string): str is GraphMode {
     || str === GraphMode.TENSOR_WEIGHT
 }
 
-function tensorToHeatmap(item: {order: number, dims: number[], raw_data: number[]}) {
+
+function tensorToHeatmap(item: TensorDesc) {
   const {order, dims, raw_data} = item;
   if(order > 2) {
     throw new Error("Cannot handle tensor of order > 2")
@@ -38,17 +39,17 @@ export class GraphManager {
   mode: GraphMode;
   ctx: Context
 
-  currentSelection: { project: string, value: string, current_index: number}
+  currentSelection: { project?: string, value?: string, current_index?: number}
 
   constructor(
     hostComponent: HTMLElement,
     context: Context
   ) {
     this.hostComponent = hostComponent;
-    this.chartElement = hostComponent.querySelector('.canvas')
-    if(this.chartElement == undefined) {
-      throw new Error("Malformed html")
-    }
+    const canvas = hostComponent.querySelector<HTMLElement>('.canvas')
+    if(canvas == null) throw new Error("Malformed html")
+    this.chartElement = canvas
+
     // this.chart = new Chart(this.chartElement, {
       // type: 'line',
       // data: { datasets: [] },
@@ -66,8 +67,7 @@ export class GraphManager {
     this.buttons.forEach((button) => {
       button.addEventListener("click", () => {
         if(isGM(button.value)) {
-          this.mode = button.value;
-          this.updateGraph(true)
+          this.updateGraph({ new_mode: button.value})
         }
       })
     })
@@ -89,109 +89,167 @@ export class GraphManager {
     }
   }
 
-  updateGraph(clear = false): void {
-    // If data is filled
-    if(this.ctx.data[this.ctx.project]
-      && this.ctx.data[this.ctx.project][this.ctx.value]
-      && this.ctx.data[this.ctx.project][this.ctx.value].type != null) {
+  updateGraph(option: { new_project?: string, new_value?: string, new_mode?:GraphMode }) {
+    if(this.ctx.data == null ) { console.warn("Trying to update the graph without data"); return; }
 
-      switch(this.ctx.data[this.ctx.project][this.ctx.value].type) {
-        case ReadableType.SCALAR:
-          this.buttons.forEach((button) => button.hidden = !(button.value === GraphMode.HIST || button.value === GraphMode.PLOT))
-          if(this.mode !== GraphMode.HIST && this.mode !== GraphMode.PLOT) this.mode = undefined;
-          break;
-        case ReadableType.TENSOR:
-          this.buttons.forEach((button) => button.hidden = !(button.value === GraphMode.TENSOR_WEIGHT))
-          if(this.mode !== GraphMode.TENSOR_WEIGHT) this.mode = undefined;
-          break;
-      }
+    if(
+      (option.new_project == null && this.currentSelection.project == null)
+      || (option.new_value == null && this.currentSelection.value == null)
+    ) {
+      console.warn("You never selected a pair project value, cannot update")
+      return
+    }
 
-      // If selection changed
-      if(this.ctx.project != this.currentSelection.project || this.ctx.value != this.currentSelection.value) {
+    if(option.new_project && option.new_project !== this.currentSelection.project && option.new_value == null) {
+      console.warn("Cannot change project without selctioning a new value")
+      return
+    }
 
-        // default selection
-        this.currentSelection = {
-          project: this.ctx.project,
-          value: this.ctx.value,
-          current_index: 0
-        }
+    // Switching Prject and value
+    if(option.new_value && option.new_value !== this.currentSelection.value) {
 
-        switch(this.ctx.data[this.currentSelection.project][this.currentSelection.value].type) {
-          case ReadableType.SCALAR: this.mode = GraphMode.PLOT; break;
-          case ReadableType.TENSOR: this.mode = GraphMode.TENSOR_WEIGHT; break;
-        }
+      const project = option.new_project
+      const value = option.new_value
 
-        // Reinit chart
-        this.resetChart();
-        Plotly.addTraces(this.chartElement, {
-          text: this.ctx.data[this.currentSelection.project][this.currentSelection.value].data.map(x => x[0])
-            .map(DataMoStringToDate)
-            .map((_ : Date) => _.toISOString()),
-          y: this.ctx.data[this.currentSelection.project][this.currentSelection.value].data.map(x => x[1]),
-          type: 'scatter'
-        })
-        Plotly.relayout(this.chartElement, { title: `${this.currentSelection.project} : ${this.currentSelection.value}` })
-        this.currentSelection.current_index = this.ctx.data[this.currentSelection.project][this.currentSelection.value].data.length
-      }
+      if(!project) return
+      if(!value) return
+      // Check for that the data is here
+      if(this.ctx.data[project]
+        && this.ctx.data[project][value]
+        && this.ctx.data[project][value].type != null) {
 
-      // Just update of the current selection
-      if(this.ctx.project == this.currentSelection.project && this.ctx.value == this.currentSelection.value) {
-        const data = this.ctx.data[this.currentSelection.project][this.currentSelection.value].data.map(x => x[1])
-        const labels = this.ctx.data[this.currentSelection.project][this.currentSelection.value].data.map(x => x[0])
+        this.resetChart()
+
+        const data: Array<number | TensorDesc>  = this.ctx.data[project][value].data.map(_ => _[1])
+        const time: Array<Date> = this.ctx.data[project][value].data.map(x => x[0])
           .map(DataMoStringToDate)
-          .map((_ : Date) => _.toISOString())
 
-        if(clear) {
-          this.resetChart();
-          switch(this.mode) {
-            case GraphMode.HIST:
-              Plotly.addTraces(this.chartElement, {
-                type: 'histogram',
-                x: data,
-              })
-              Plotly.relayout(this.chartElement, { title: `${this.currentSelection.project} : ${this.currentSelection.value}` })
-              break
-            case GraphMode.PLOT:
-              Plotly.addTraces(this.chartElement, {
-                y: data,
-                text: labels,
-                type: 'scatter'
-              })
-              Plotly.relayout(this.chartElement, { title: `${this.currentSelection.project} : ${this.currentSelection.value}` })
-              break
-            case GraphMode.TENSOR_WEIGHT:
-              Plotly.addTraces(this.chartElement, {
-                z: tensorToHeatmap(data[data.length - 1]),
-                type: 'heatmap'
-              })
-              Plotly.relayout(this.chartElement, { title: `${this.currentSelection.project} : ${this.currentSelection.value}` })
-              break
-          }
-        } else {
-          switch(this.mode) {
-            case GraphMode.HIST:
-              Plotly.extendTraces(this.chartElement, {
-                x: [data.slice(this.chart.data[0].x.length)],
-              }, [0])
-              break
-            case GraphMode.PLOT:
-              Plotly.extendTraces(this.chartElement, {
-                y:    [data.slice(this.chart.data[0].y.length)],
-                text: [labels.slice(this.chart.data[0].y.length)]
-              }, [0])
-              break
-            case GraphMode.TENSOR_WEIGHT:
-              this.resetChart()
-              console.log(data[data.length - 1])
-              Plotly.addTraces(this.chartElement, {
-                z: tensorToHeatmap(data[data.length - 1]),
-                type: 'heatmap'
-              })
-              Plotly.relayout(this.chartElement, { title: `${this.currentSelection.project} : ${this.currentSelection.value}` })
-              break
-          }
+        switch(this.ctx.data[project][value].type) {
+          case ReadableType.SCALAR:
+            this.buttons.forEach((button) => button.hidden = !(button.value === GraphMode.HIST || button.value === GraphMode.PLOT))
+            this.mode = GraphMode.PLOT
+
+            Plotly.addTraces(this.chartElement, {
+              text: time.map((_ : Date) => _.toISOString()),
+              y: this.ctx.data[project][value].data.map(x => x[1]),
+              type: 'scatter'
+            })
+
+            break;
+          case ReadableType.TENSOR:
+            this.buttons.forEach((button) => button.hidden = !(button.value === GraphMode.TENSOR_WEIGHT))
+            this.mode = GraphMode.TENSOR_WEIGHT
+
+            if(!isArrayOf(data, isTensorDesc)) { throw new Error("Corrupted data") }
+
+            Plotly.addTraces(this.chartElement, {
+              z: tensorToHeatmap(data[data.length - 1]),
+              type: 'heatmap'
+            })
+
+            break;
         }
+
+        Plotly.relayout(this.chartElement, { title: `${project} : ${value}` })
+        this.currentSelection.current_index = data.length
+
+
+        } else {
+          console.info(`It seems that ${project} : ${value} does not exist yet in the context`)
+          return
+        }
+
+        this.currentSelection.project = option.new_project
+        this.currentSelection.value = option.new_value
+    }
+
+    // New graph type
+    if(option.new_mode && option.new_mode !== this.mode) {
+      const { project , value } = this.currentSelection;
+
+      if(project == null || value == null) return
+
+      if(!(this.ctx.data[project][value].type === ReadableType.SCALAR && (option.new_mode === GraphMode.HIST || option.new_mode === GraphMode.PLOT))
+        && !(this.ctx.data[project][value].type === ReadableType.TENSOR && option.new_mode === GraphMode.TENSOR_WEIGHT))
+      {
+        console.warn('Asking for illegal graph type and data type combination')
+        return
       }
+
+      const data : Array<number | TensorDesc> = this.ctx.data[project][value].data.map(x => x[1])
+      const time : Array<Date> = this.ctx.data[project][value].data.map(x => x[0])
+        .map(DataMoStringToDate)
+
+      this.resetChart()
+
+      this.mode = option.new_mode
+
+      switch(this.mode) {
+        case GraphMode.PLOT:
+          Plotly.addTraces(this.chartElement, {
+            text: time.map((_ : Date) => _.toISOString()),
+            y: this.ctx.data[project][value].data.map(x => x[1]),
+            type: 'scatter'
+          })
+
+          break;
+        case GraphMode.HIST:
+          Plotly.addTraces(this.chartElement, {
+            type: 'histogram',
+            x: data,
+          })
+
+          break;
+
+        case GraphMode.TENSOR_WEIGHT:
+          if(isArrayOf(data, isTensorDesc)) {
+            Plotly.addTraces(this.chartElement, {
+              z: tensorToHeatmap(data[data.length - 1]),
+              type: 'heatmap'
+            })
+          }
+
+          break;
+      }
+
+      this.currentSelection.current_index = data.length
+
+    }
+
+    // New data
+    if(option.new_mode == null && option.new_project == null && option.new_value == null) {
+      const { project, value } = this.currentSelection
+
+      if(!project) return
+      if(!value) return
+
+      const data : Array<number | TensorDesc> = this.ctx.data[project][value].data.map(x => x[1])
+      const time : Array<Date> = this.ctx.data[project][value].data.map(x => x[0])
+        .map(DataMoStringToDate)
+
+      switch(this.mode) {
+        case GraphMode.HIST:
+          Plotly.extendTraces(this.chartElement, {
+            x: [data.slice(this.currentSelection.current_index)],
+          }, [0])
+          break
+        case GraphMode.PLOT:
+          Plotly.extendTraces(this.chartElement, {
+            y:    [data.slice(this.currentSelection.current_index)],
+            text: [time.slice(this.currentSelection.current_index).map(_ => _.toISOString())]
+          }, [0])
+          break
+        case GraphMode.TENSOR_WEIGHT:
+          this.resetChart()
+
+          if(isArrayOf(data, isTensorDesc)) {
+            Plotly.addTraces(this.chartElement, {
+              z: tensorToHeatmap(data[data.length - 1]),
+              type: 'heatmap'
+            })
+            }
+          break
+        }
     }
   }
 }

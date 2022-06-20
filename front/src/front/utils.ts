@@ -6,10 +6,10 @@ export const ReadableType = {
 }
 
 export class Context {
-  project: string = undefined;
-  value: string = undefined;
-  mode: GraphMode = undefined
-  data: object = undefined;
+  project?: string = undefined;
+  value?: string = undefined;
+  mode?: GraphMode = undefined
+  data?: object = undefined;
 }
 
 export function DataMoStringToDate(str: string) {
@@ -32,4 +32,18 @@ export function DataMoStringToDate(str: string) {
   }
 
   return new Date(Date.now())
+}
+
+
+export type TensorDesc = {order: number, dims: number[], raw_data: number[]}
+
+export function isTensorDesc(x: any): x is TensorDesc {
+  return typeof x === 'object'
+   && x['order'] != null && typeof x.order === 'number'
+   && x['dims'] != null && x.dims instanceof Array && x.dims.every(_ => typeof _ === 'number')
+   && x['raw_data'] != null && x.raw_data instanceof Array && x.raw_data.every(_ => typeof _ === 'number')
+}
+
+export function isArrayOf<A, T>(arr: Array<A | T>, test_t: (x: any) => x is T): arr is Array<T> {
+  return arr.every(test_t)
 }

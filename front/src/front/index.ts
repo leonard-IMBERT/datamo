@@ -1,4 +1,5 @@
 import { GraphManager, GraphMode } from "./component/graph";
+import { RawManager } from "./component/raw";
 import { ReadableType, Context } from "./utils";
 
 // Crawl the html
@@ -19,6 +20,9 @@ if(!(value_selector instanceof HTMLDivElement) || !(value instanceof HTMLSelectE
   throw 'Malformed html'
 }
 
+if(graph == null || raw == null) throw new Error("Malformed html")
+
+
 
 const ctx = new Context();
 
@@ -27,20 +31,7 @@ const cache = {}
 ctx.data = cache;
 
 const gManager = new GraphManager(graph, ctx);
-
-function update_content(context: Context) {
-  const {project, value} = context
-  raw.innerText = ""
-  if(cache[project] && cache[project][value] && cache[project][value].data) {
-    cache[project][value].data.forEach((entry) => {
-      if(cache[project][value].type === ReadableType.SCALAR) {
-        raw.innerText += `${entry[0]} : ${entry[1]}\n`
-      } else if (cache[project][value].type === ReadableType.TENSOR) {
-        raw.innerText += `${entry[0]} : Tensor(${entry[1].dims})\n`
-      }
-    })
-  }
-}
+const rManager = new RawManager(raw, ctx)
 
 // Initialize websocket
 const socket = new WebSocket(`ws://${location.hostname}:3010`)
@@ -53,14 +44,16 @@ socket.addEventListener('message', (event) => {
     cache[reicv_obj.project][reicv_obj.value] = {
       type: reicv_obj.type,
       data: reicv_obj.data
+
     }
+    gManager.updateGraph({ new_project: ctx.project, new_value: ctx.value })
+    rManager.updateRaw({ new_project: ctx.project, new_value: ctx.value })
   } else if (Object.keys(reicv_obj).find(_ => _ === 'new_data')) {
     // new data event
     cache[reicv_obj.project][reicv_obj.value].data.push(reicv_obj.new_data)
+    gManager.updateGraph({})
+    rManager.updateRaw({})
   }
-
-  update_content(ctx)
-  gManager.updateGraph()
 })
 
 
@@ -120,8 +113,8 @@ value.addEventListener('change', () => {
   ctx.project = project.value;
   ctx.value = value.value;
 
-  update_content(ctx);
-  gManager.updateGraph();
+  gManager.updateGraph({new_project: project.value, new_value: value.value});
+  rManager.updateRaw({new_project: project.value, new_value: value.value});
 })
 
 

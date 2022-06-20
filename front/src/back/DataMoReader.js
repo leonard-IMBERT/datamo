@@ -70,6 +70,8 @@ class DataMoReader {
   }
 
   async read() {
+    if(!fs.existsSync(this.file)) throw new Error(`Cannot read the DataMo file in ${this.file}`)
+
     this.file_obj = await fs.promises.open(this.file, 'a+')
     this.reading = true;
 
