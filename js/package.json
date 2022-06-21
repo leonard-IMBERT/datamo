@@ -1,0 +1,22 @@
+{
+  "name": "datamo-reader",
+  "version": "0.1.1",
+  "description": "An implementation of a reader in javascript for DataMo files",
+  "main": "DataMoReader.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.in2p3.fr/imbert/datamo.git"
+  },
+  "keywords": [
+    "data",
+    "monitoring",
+    "neural",
+    "networks",
+    "datamo"
+  ],
+  "author": "Leonard Imbert <imbert@subatech.in2p3.fr>",
+  "license": "ISC"
+}

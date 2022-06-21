@@ -1,6 +1,6 @@
 const express = require('express');
 const { ArgumentParser } = require('argparse');
-const { DataMoReader } = require('./src/back/DataMoReader');
+const { DataMoReader } = require('../js/DataMoReader');
 const { Registration } = require('./src/back/Registration');
 const { join } = require('path');
 const  WebSocket = require('ws');
