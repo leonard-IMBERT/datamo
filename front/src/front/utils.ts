@@ -13,7 +13,7 @@ export class Context {
 }
 
 export function DataMoStringToDate(str: string) {
-  const res = str.trim().match(/^(?<Day>[0-9]{2})\/(?<Month>[0-9]{2})\/(?<Year>[0-9]{4})~(?<Hour>[0-9]{2}):(?<Min>[0-9]{2}):(?<Sec>[0-9]{2}):(?<Milli>[0-9]{3})$/m)
+  const res = str.trim().match(/^(?<Day>[0-9]{2})\/(?<Month>[0-9]{2})\/(?<Year>[0-9]{4})~(?<Hour>[0-9]{2}):(?<Min>[0-9]{2}):(?<Sec>[0-9]{2})::(?<Milli>[0-9]{3})$/m)
   if(res) {
     const date = new Date()
     date.setFullYear(
