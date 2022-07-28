@@ -110,7 +110,6 @@ class DataMoReader {
     let offset = 0
 
     while(offset < file_content.length - 1) {
-      console.log(offset)
       let header = file_content.subarray(offset, offset + 64)
       offset += 64
 
