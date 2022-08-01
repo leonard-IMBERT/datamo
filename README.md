@@ -56,6 +56,9 @@ For this entry `project name` replace the `name` field and size is 0;
 If no `META_PROJECT` is present in the file, the entries are considered to belong to the `default` project
 
 ## Changelog
+ - `0.3.0`
+   - The raw part of the front now scroll to new logs
+   - Fix the WS port selection
  - `0.2.0`
    - Add the python reader
    - Fix a leftover console.log in the js reader
