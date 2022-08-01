@@ -18,7 +18,7 @@ endif()
 
 # ================= DataMo ==================
 
-project(DataMo VERSION 0.3.0 DESCRIPTION "Data Monitoring Library")
+project(DataMo VERSION 0.3.1 DESCRIPTION "Data Monitoring Library")
 
 add_library(DataMo STATIC
   writer.cpp

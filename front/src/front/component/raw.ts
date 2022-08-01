@@ -62,6 +62,10 @@ export class RawManager {
                 return tensorDataToString(data)
             }
           }).forEach((_ : string) => this.raw_log.appendChild(document.createElement('li')).textContent = _)
+          this.raw_log.lastElementChild?.scrollIntoView({
+            block: 'end',
+            behavior: 'smooth'
+          })
 
         this.selection = { project, value }
 
