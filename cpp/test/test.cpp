@@ -1,11 +1,12 @@
-#include "../writer.hpp"
-#include <random>
 #include <cctype>
+#include <random>
 
-using u32    = uint_least32_t;
+#include "../writer.hpp"
+
+using u32 = uint_least32_t;
 using engine = std::mt19937;
 
-int main(int argc, char * args[]) {
+int main(int argc, char* args[]) {
   std::random_device os_seed;
   const u32 seed = os_seed();
 
@@ -39,14 +40,14 @@ int main(int argc, char * args[]) {
     writer.write_data(&item);
   }
   {
-    DataMo::ScalarItem item("Very very very long description of a parameter", 2);
+    DataMo::ScalarItem item("Very very very long description of a parameter",
+                            2);
     writer.write_data(&item);
   }
   {
     DataMo::TensorItem item("Some tensor", torch::rand({10, 2}));
     writer.write_data(&item);
   }
-
 
   return 0;
 }
