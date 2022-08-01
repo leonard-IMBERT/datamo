@@ -7,11 +7,11 @@
  *
  * @copyright Copyright (c) 2022
  */
-#include <string>
+#include <torch/torch.h>
+
 #include <fstream>
 #include <mutex>
 #include <string>
-#include <torch/torch.h>
 
 #ifndef DATA_MO_H
 #define DATA_MO_H
@@ -42,7 +42,7 @@ struct Item {
   std::string name;
   WritableType type;
   unsigned long size;
-  void * data_pointer = nullptr;
+  void* data_pointer = nullptr;
 };
 
 /**
@@ -80,7 +80,7 @@ struct TensorItem : public Item {
   /**
    * @brief Pointer to the order and dims data
    */
-  int32_t * order_dims;
+  int32_t* order_dims;
 
   /**
    * @brief
@@ -99,7 +99,6 @@ struct TensorItem : public Item {
     type = TENSOR;
     data = d.clone().detach().cpu().to(torch::kFloat64).contiguous();
 
-
     data_pointer = data.data_ptr<double>();
 
     int32_t orders = d.sizes().size();
@@ -109,7 +108,7 @@ struct TensorItem : public Item {
     order_dims[0] = orders;
 
     size = 1;
-    for(unsigned int order = 0; order < orders; order ++) {
+    for (unsigned int order = 0; order < orders; order++) {
       order_dims[order + 1] = d.size(order);
       size = size * d.size(order);
     }
@@ -119,9 +118,7 @@ struct TensorItem : public Item {
     size = size * sizeof(double);
   };
 
-  ~TensorItem() {
-    delete order_dims;
-  }
+  ~TensorItem() { delete order_dims; }
 };
 
 /**
@@ -141,7 +138,6 @@ struct MetaProjectItem : public Item {
   };
 };
 
-
 /**
  * @brief The writer that will write item in the .datamo file
  *
@@ -149,11 +145,11 @@ struct MetaProjectItem : public Item {
  * i.e., it use mutex to ensure no concurrent acces to the file by the instance
  * it ensure, all data have been flushed to the file before inputing new data
  *
- * Thet facts ensure that the data are writed in the order they were given to the
- * writer
+ * Thet facts ensure that the data are writed in the order they were given to
+ * the writer
  *
- * Beware if it is used by multiple threads: the data will be written in the file
- * in the same order the threads called it.
+ * Beware if it is used by multiple threads: the data will be written in the
+ * file in the same order the threads called it.
  */
 class Writer {
  private:
@@ -163,19 +159,19 @@ class Writer {
   std::string _out_file = "log.datamo";
 
   std::string _out_location;
+
  public:
- /**
-  * @brief Construct a new Writer object
-  *
-  * @param location Place where to create the log file
-  */
+  /**
+   * @brief Construct a new Writer object
+   *
+   * @param location Place where to create the log file
+   */
   Writer(std::string location);
 
   /**
    * @brief Destroy the Writer object
    */
   ~Writer();
-
 
   /**
    * @brief Set the out location object
@@ -190,7 +186,8 @@ class Writer {
    * the out locatio0n
    *
    * /!\ Warning: You should not but if you give a path to this function
-   * know that it will be appened to the out location resulting in undefined behavior
+   * know that it will be appened to the out location resulting in undefined
+   * behavior
    */
   void set_out_file(std::string);
 
@@ -199,9 +196,9 @@ class Writer {
    *
    * @param data The data to write
    */
-  void write_data(Item * data);
+  void write_data(Item* data);
 };
 
-} // namespace DataMo
+}  // namespace DataMo
 
 #endif
