@@ -86,7 +86,14 @@ export class RawManager {
               case ReadableType.TENSOR:
                 return tensorDataToString(data)
             }
-          }).forEach((_ : string) => this.raw_log.appendChild(document.createElement('li')).textContent = _)
+          }).forEach((_ : string) => {
+            const li = this.raw_log.appendChild(document.createElement('li'))
+            li.textContent = _
+            li.scrollIntoView({
+              block: 'end',
+              behavior: 'smooth',
+            })
+          })
     }
   }
 }
