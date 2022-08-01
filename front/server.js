@@ -46,7 +46,7 @@ app.get('/ressources/css',          (_, res) => res.status(200).sendFile(join(__
 app.get('/ressources/js',           (_, res) => res.status(200).sendFile(join(__dirname, 'src/front/dist/index.js')));
 app.get('/ressources/index.js.map', (_, res) => res.status(200).sendFile(join(__dirname, 'src/front/dist/index.js.map')));
 app.get('/project/?',               (_, res) => res.status(200).send(JSON.stringify(Object.keys(reader.events))));
-app.get('/project/:project/?', (req, res) => {
+app.get('/project/:project/?',      (req, res) => {
   const { project } = req.params;
   if(reader.events[project] == null) {
     res.sendStatus(404);
@@ -62,6 +62,7 @@ app.get('/project/:project/:value/?', (req, res) => {
     res.status(200).send(JSON.stringify(reader.events[project][value]))
   }
 })
+app.get('/config/',                   (_, res) => res.status(200).send(JSON.stringify({ 'wss-port': args.wport })))
 
 
 wss.on('connection', ws => {

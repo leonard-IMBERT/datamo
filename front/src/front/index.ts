@@ -33,29 +33,35 @@ ctx.data = cache;
 const gManager = new GraphManager(graph, ctx);
 const rManager = new RawManager(raw, ctx)
 
-// Initialize websocket
-const socket = new WebSocket(`ws://${location.hostname}:3010`)
+let socket: WebSocket | undefined = undefined
 
-socket.addEventListener('message', (event) => {
-  const reicv_obj = JSON.parse(event.data)
+fetch('/config/', { method: 'GET' }).then(_ => _.json()).then((obj) => {
+  if(obj['wss-port'] == null) throw 'Malformed json from /config/'
 
-  if(Object.keys(reicv_obj).find(_ => _ === 'type') != null) {
-    // registration event
-    cache[reicv_obj.project][reicv_obj.value] = {
-      type: reicv_obj.type,
-      data: reicv_obj.data
+  // Initialize websocket
+  socket = new WebSocket(`ws://${location.hostname}:${obj['wss-port']}`)
+  console.log(`WS listening on ${obj['wss-port']}`)
 
+  socket.addEventListener('message', (event) => {
+    const reicv_obj = JSON.parse(event.data)
+
+    if(Object.keys(reicv_obj).find(_ => _ === 'type') != null) {
+      // registration event
+      cache[reicv_obj.project][reicv_obj.value] = {
+        type: reicv_obj.type,
+        data: reicv_obj.data
+
+      }
+      gManager.updateGraph({ new_project: ctx.project, new_value: ctx.value })
+      rManager.updateRaw({ new_project: ctx.project, new_value: ctx.value })
+    } else if (Object.keys(reicv_obj).find(_ => _ === 'new_data')) {
+      // new data event
+      cache[reicv_obj.project][reicv_obj.value].data.push(reicv_obj.new_data)
+      gManager.updateGraph({})
+      rManager.updateRaw({})
     }
-    gManager.updateGraph({ new_project: ctx.project, new_value: ctx.value })
-    rManager.updateRaw({ new_project: ctx.project, new_value: ctx.value })
-  } else if (Object.keys(reicv_obj).find(_ => _ === 'new_data')) {
-    // new data event
-    cache[reicv_obj.project][reicv_obj.value].data.push(reicv_obj.new_data)
-    gManager.updateGraph({})
-    rManager.updateRaw({})
-  }
-})
-
+  })
+}).catch(console.error)
 
 // Initialize projects selection
 fetch('/project', {
@@ -99,22 +105,22 @@ project.addEventListener('change', () => {
 });
 
 value.addEventListener('change', () => {
-  if(socket.readyState != socket.OPEN) {
-    console.error(`Websocket not yet oppened, currently in ${socket.readyState} state`)
-  }
+  if(socket == null || socket.readyState != socket.OPEN) {
+    console.warn(`Websocket not yet oppened`)
+  } else {
+    if(cache[project.value][value.value] == null) {
+      cache[project.value][value.value] = {}
+      socket.send(JSON.stringify({
+        project: project.value,
+        value: value.value
+      }));
+    }
+    ctx.project = project.value;
+    ctx.value = value.value;
 
-  if(cache[project.value][value.value] == null) {
-    cache[project.value][value.value] = {}
-    socket.send(JSON.stringify({
-      project: project.value,
-      value: value.value
-    }));
+    gManager.updateGraph({new_project: project.value, new_value: value.value});
+    rManager.updateRaw({new_project: project.value, new_value: value.value});
   }
-  ctx.project = project.value;
-  ctx.value = value.value;
-
-  gManager.updateGraph({new_project: project.value, new_value: value.value});
-  rManager.updateRaw({new_project: project.value, new_value: value.value});
 })
 
 
