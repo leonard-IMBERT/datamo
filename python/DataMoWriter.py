@@ -47,7 +47,7 @@ class TensorItem(Item):
   """An item holding a tensor
      Support pytorch and tensorflow tensors
   """
-  def __init__(self, name: str, data: torch.Tensor | tf.Tensor):
+  def __init__(self, name: str, data):
     if isinstance(data, torch.Tensor):
       raw_data = data.clone().detach().cpu().to(torch.float64).contiguous().numpy()
       self.dims = data.size()
