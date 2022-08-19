@@ -5,9 +5,8 @@ set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
-if(EXISTS ${PROJECT_SOURCE_DIR}/libtorch)
-  message("${PROJECT_NAME}: Found local libtorch")
-  set(TORCH_PREFIX_PATH ${PROJECT_SOURCE_DIR}/libtorch)
+if(EXISTS ${CMAKE_SOURCE_DIR}/libtorch)
+  set(TORCH_PREFIX_PATH ${CMAKE_SOURCE_DIR}/libtorch)
 else()
   execute_process(COMMAND python3 -c "import torch;print(torch.utils.cmake_prefix_path)"
     COMMAND tr -d \\n
@@ -37,12 +36,11 @@ set_target_properties(DataMo PROPERTIES CXX_STANDARD 14)
 
 target_link_libraries(DataMo ${TORCH_LIBRARIES})
 
-install(TARGETS DataMo
-  LIBRARY DESTINATION ${DataMo_SOURCE_DIR}/lib
-  PUBLIC_HEADER DESTINATION ${DataMo_SOURCE_DIR}/include)
+install(TARGETS DataMo)
 
-configure_file(./DataMo.pc.in ./DataMo.pc @ONLY)
-install(FILES ${CMAKE_BINARY_DIR}/DataMo.pc DESTINATION ${DataMo_SOURCE_DIR}/pkgconfig)
+configure_file(./DataMo.pc.in ${DataMo_BINARY_DIR}/DataMo.pc @ONLY)
+
+install(FILES ${DataMo_BINARY_DIR}/DataMo.pc DESTINATION lib/pkgconfig)
 
 # =============== Test ===============
 project(DataMoTest VERSION 0.1.1 DESCRIPTION "Testing DataMo")
