@@ -1,6 +1,6 @@
 import os.path as path
 from enum import Enum
-from typing import Callable, Union
+from typing import Callable, Union, Tuple
 import struct
 import asyncio
 
@@ -36,7 +36,7 @@ class ReadableType(Enum):
   """Meta tag that specify the project"""
 
 
-def readTensorFromBuffer(buffer: bytes) -> tuple[int, list, list]:
+def readTensorFromBuffer(buffer: bytes) -> Tuple[int, list, list]:
   """Transform a data buffer into a "tensor"
   """
   cursor = 0
@@ -110,7 +110,7 @@ class DataMoReader:
         data: bytes = file_content[offset:offset + size]
         offset += size
 
-        chunk_result: Union[tuple[str, str], None] = self.chunk_to_object(header, data)
+        chunk_result: Union[Tuple[str, str], None] = self.chunk_to_object(header, data)
 
         if chunk_result is not None and self.on_new_data_f is not None:
           self.on_new_data_f(chunk_result[0], chunk_result[1])
@@ -161,7 +161,7 @@ class DataMoReader:
     """
     self.on_new_data_f = f
 
-  def chunk_to_object(self, header: bytes, data: bytes) -> Union[tuple[str, str], None]:
+  def chunk_to_object(self, header: bytes, data: bytes) -> Union[Tuple[str, str], None]:
     """Transform a chunk into event object and store it in ctx
     """
     magic_string = header[0: 6]
