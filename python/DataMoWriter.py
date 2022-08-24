@@ -5,6 +5,7 @@ import tensorflow as tf
 import numpy as np
 from typing import Any
 from datetime import datetime
+from math import floor
 
 class WritableType(Enum):
   """The different writable type known
@@ -97,7 +98,7 @@ class DataMoWriter():
     """Write an item in the log file"""
 
     now = datetime.now()
-    nowstr = f'{now.day:02}/{now.month:02}/{now.year:02}~{now.hour:02}:{now.minute:02}:{now.second:02}::{round(now.microsecond / 1000):03}'
+    nowstr = f'{now.day:02}/{now.month:02}/{now.year:02}~{now.hour:02}:{now.minute:02}:{now.second:02}::{floor(now.microsecond / 1000):03}'
 
     self.file.write(b'DATAMO')
     self.file.write(nowstr.encode('utf-8'))
