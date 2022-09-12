@@ -11,7 +11,7 @@ Implementations of the reader exists currently for the following languages:
 
 An web interface to read the data in realtime is developped in [nodejs](nodejs.org). The implentation is located in the [front](front/) folder
 
-## Data definition (v0.1)
+## Data definition (v0.2)
 
 The data of the monitoring are stored in binary file using the `.datamo` extension.
 They are stored following the following scheme
@@ -31,15 +31,15 @@ The content of data depends of the value of ID
 
 ## List of IDs
 
-### Scalar (1)
-Store a scalar as a double (8 bytes)
+### Scalar (0)
+Store a scalar as a `double` (8 bytes)
 
 | data    |
 |:-------:|
 | 8 bytes |
 
-### Tensor (2)
-Store a tensor of double. Data take the following shape
+### Tensor (1)
+Store a tensor of `double`. Data take the following shape
 
 |order of the tensor| dimension           | data               |
 |:-----------------:|:-------------------:|:------------------:|
@@ -49,13 +49,26 @@ Store a tensor of double. Data take the following shape
 - dimension : `unsigned int`
 - data : `double`
 
-### Meta Project (3)
+### Meta Project (2)
 Indicate that the next entry until the next `META_PROJECT` entry are related to the project `project name`.
 For this entry `project name` replace the `name` field and size is 0;
 
-If no `META_PROJECT` is present in the file, the entries are considered to belong to the `default` project
+If no `META_PROJECT` is present in the file, the entries are considered to belong to the `default` Project
+
+### String (3)
+
+Log a `string`
+
+| data                |
+|:-------------------:|
+| utf8 encoded string |
 
 ## Changelog
+ - `0.4.0`
+   - Spec goes from `v0.1` to `v0.2`
+     - Add the String entry
+   - Fixes in the typescript implentation
+   - Update the UI
  - `0.3.1`
    - Fix scrolling when first loading data
  - `0.3.0`
