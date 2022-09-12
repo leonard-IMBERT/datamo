@@ -6,7 +6,7 @@ export type Tensor = {
 };
 export type Values = {
     type: number;
-    data: Array<[string, Scalar | Tensor]>;
+    data: Array<[string, Scalar]> | Array<[string, Tensor]>;
 };
 export type Project = {
     [x: string]: Values;
