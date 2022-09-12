@@ -35,6 +35,9 @@ class ReadableType(Enum):
   META_PROJECT = 2
   """Meta tag that specify the project"""
 
+  STRING = 3
+  """A string"""
+
 
 def readTensorFromBuffer(buffer: bytes) -> Tuple[int, list, list]:
   """Transform a data buffer into a "tensor"
@@ -172,7 +175,7 @@ class DataMoReader:
     entry_type: int = int.from_bytes(header[30:32], 'little')
     entry_name: str = header[32:32+24].decode('utf-8').strip('\x00').strip()
 
-    if entry_type == ReadableType.META_PROJECT:
+    if entry_type == ReadableType.META_PROJECT.value:
       self.selected = entry_name
 
       if self.events.get(self.selected) is None:
@@ -187,6 +190,7 @@ class DataMoReader:
 
     if entry_type == ReadableType.SCALAR.value: (parsed_data,) = struct.unpack('<d', data)
     elif entry_type == ReadableType.TENSOR.value: parsed_data = readTensorFromBuffer(data)
+    elif entry_type == ReadableType.STRING.value: parsed_data = data.decode('utf-8')
     else:
       raise MalformedFile('Entry type', header[30:32], "Expected the type to be one present in ReadableType")
 

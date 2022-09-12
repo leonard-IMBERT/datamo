@@ -33,6 +33,9 @@ enum WritableType {
 
   // Metadata
   META_PROJECT = 2, /**< Meta tag that specify the project */
+
+  // String
+  STRING = 3, /**< String data */
 };
 
 /**
@@ -42,7 +45,7 @@ struct Item {
   std::string name;
   WritableType type;
   unsigned long size;
-  void* data_pointer = nullptr;
+  const void* data_pointer = nullptr;
 };
 
 /**
@@ -136,6 +139,17 @@ struct MetaProjectItem : public Item {
     size = 0;
     data_pointer = nullptr;
   };
+};
+
+struct StringItem : public Item {
+  std::string str;
+
+  StringItem(std::string n, std::string s): str(s) {
+    name = n;
+    type = STRING;
+    size = str.length();
+    data_pointer = str.c_str();
+  }
 };
 
 /**

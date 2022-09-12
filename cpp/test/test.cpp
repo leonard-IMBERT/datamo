@@ -48,6 +48,10 @@ int main(int argc, char* args[]) {
     DataMo::TensorItem item("Some tensor", torch::rand({10, 2}));
     writer.write_data(&item);
   }
+  {
+    DataMo::StringItem item("Plop", "Plap");
+    writer.write_data(&item);
+  }
 
   return 0;
 }

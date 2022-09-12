@@ -18,6 +18,9 @@ class WritableType(Enum):
   META_PROJECT = 2
   """Meta tag that specify the project"""
 
+  STRING = 3
+  """A string"""
+
 class Item():
   """Abstract class that represent an item"""
   def __init__(
@@ -66,6 +69,11 @@ class MetaProjectItem(Item):
   """Meta project item"""
   def __init__(self, name: str):
     super().__init__(name, WritableType.META_PROJECT, 0, None)
+
+class StringItem(Item):
+  """A string item"""
+  def __init__(self, name: str, data: str):
+    super().__init__(name, WritableType.STRING, len(data), data)
 
 class DataMoWriter():
   """Implementation of the writer"""

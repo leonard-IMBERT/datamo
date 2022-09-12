@@ -12,6 +12,9 @@ const ReadeableType = {
 
   // Metadata
   META_PROJECT: 2, /**< Meta tag that specify the project */
+
+  // Status
+  STRING: 3, /**< A status */
 };
 
 /**
@@ -217,6 +220,7 @@ class DataMoReader {
     switch (type) {
       case ReadeableType.SCALAR: parsed_data = data.readDoubleLE(); break;
       case ReadeableType.TENSOR: parsed_data = readTensorFromBuffer(data); break;
+      case ReadeableType.STRING: parsed_data = data.toString(); break;
       default: console.error(`Data type ${type} is unknown`); parsed_data = undefined;
     }
 

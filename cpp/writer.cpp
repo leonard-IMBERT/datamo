@@ -80,7 +80,7 @@ void Writer::write_data(Item *data) {
                       dataT->order_dims_size * sizeof(int32_t));
   }
 
-  _out_stream.write(reinterpret_cast<char *>(data->data_pointer), data->size);
+  _out_stream.write(reinterpret_cast<const char *>(data->data_pointer), data->size);
 
   _out_stream.flush();
 
