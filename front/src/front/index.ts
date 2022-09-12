@@ -10,7 +10,9 @@ const value_selector = document.getElementById('value-selector');
 const value = document.getElementById('value');
 
 const graph = document.getElementById('graph');
-const raw = document.getElementById('raw')
+const raw = document.getElementById('raw');
+
+const emptyMessage = document.getElementById('empty-message');
 
 if(!(project_selector instanceof HTMLDivElement) || !(project instanceof HTMLSelectElement)) {
   throw 'Malformed html'
@@ -120,6 +122,9 @@ value.addEventListener('change', () => {
 
     gManager.updateGraph({new_project: project.value, new_value: value.value});
     rManager.updateRaw({new_project: project.value, new_value: value.value});
+
+    graph.hidden = false;
+    emptyMessage.hidden = true;
   }
 })
 

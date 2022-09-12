@@ -1,5 +1,5 @@
 import { GraphMode } from "./component/graph";
-
+import { ProjectHolder } from '../../../js/DataMoReader'
 export const ReadableType = {
   SCALAR:0,
   TENSOR: 1,
@@ -9,8 +9,9 @@ export class Context {
   project?: string = undefined;
   value?: string = undefined;
   mode?: GraphMode = undefined
-  data?: object = undefined;
+  data?: ProjectHolder = undefined;
 }
+
 
 export function DataMoStringToDate(str: string) {
   const res = str.trim().match(/^(?<Day>[0-9]{2})\/(?<Month>[0-9]{2})\/(?<Year>[0-9]{4})~(?<Hour>[0-9]{2}):(?<Min>[0-9]{2}):(?<Sec>[0-9]{2})::(?<Milli>[0-9]{3})$/m)
@@ -47,4 +48,8 @@ export function isTensorDesc(x: any): x is TensorDesc {
 
 export function isArrayOf<A, T>(arr: Array<A | T>, test_t: (x: any) => x is T): arr is Array<T> {
   return arr.every(test_t)
+}
+
+export function isNumberArray(arr: Array<any>): arr is number[] {
+  return arr.every(_ => typeof _ === 'number')
 }

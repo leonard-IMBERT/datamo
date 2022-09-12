@@ -15,24 +15,36 @@
   <aside>
     <div class="selector" id="project-selector">
       <h2>Select project</h2>
-      <select id="project"></select>
+      <select id="project" class="mdc-button mdc-button--raised mdc-button__label"></select>
     </div>
 
     <div class="selector" id="value-selector">
       <h2>Value</h2>
-      <select id="value">
+      <select id="value" class="mdc-button mdc-button--raised mdc-button__label">
         <option value="" selected disabled hidden>Choose here</option>
       </select>
     </div>
   </aside>
   <main>
-    <div id="graph">
+    <div id="graph" hidden>
       <nav class="graph-selector">
-        <button value="plot" hidden>Plot</button>
-        <button value="hist" hidden>Histogram</button>
-        <button value="tensor-weight" hidden>Tensor weight</button>
+        <button value="plot" hidden class="mdc-button mdc-button--outlined">
+          <span class="mdc-button__ripple"></span>
+          <span class="mdc-button__label">Plot</span>
+        </button>
+        <button value="hist" hidden class="mdc-button mdc-button--outlined">
+          <span class="mdc-button__ripple"></span>
+          <span class="mdc-button__label">Histogram</span>
+        </button>
+        <button value="tensor-weight" hidden class="mdc-button mdc-button--outlined">
+          <span class="mdc-button__ripple"></span>
+          <span class="mdc-button__label">Tensor weight</span>
+        </button>
       </nav>
       <div class="canvas"></div>
+    </div>
+    <div id="empty-message">
+      <p>Please, select a project and a value</p>
     </div>
     <div id="raw">
       <ul class="raw-log"></ul>

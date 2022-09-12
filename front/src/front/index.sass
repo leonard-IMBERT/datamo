@@ -1,0 +1,108 @@
+@use "@material/theme" with ($primary: #79d4e4, $secondary: #324B4F, $on-primary:#FFFFFF)
+
+@use '@material/button/mdc-button'
+@use '@material/button/styles'
+@use '@material/button'
+
+@use "@material/list/mdc-list"
+@use "@material/menu-surface/mdc-menu-surface"
+@use "@material/menu/mdc-menu"
+
+
+$border-width: 1px
+
+html
+  padding: 0
+  margin: 0
+  height: 100%
+  width: 100%
+
+
+body
+  padding: 0
+  margin: 0
+  height: 100%
+  width: 100%
+  display: flex
+  flex-wrap: wrap
+  font-family: 'Inter', sans-serif
+
+
+  header
+    width: 100%
+    height: 80px
+    padding-left: 25px
+    border-bottom: $border-width solid gainsboro
+    /* background-color: rgb(212, 212, 212) */
+
+  aside
+    height: calc(100% - 80px)
+    width: calc(15% - $border-width)
+    border-right:  $border-width solid gainsboro
+
+
+  main
+    height: calc(100% - 80px)
+    width: 85%
+    display: flex
+
+    .content
+      padding-left: 20px
+
+
+.selector
+  padding: 0 15px
+  padding-bottom: 15px
+  margin-bottom: 50px
+
+  select
+    width: 100%
+    appearance: none
+    opacity: 100
+    display: block
+    position: relative
+    padding-left: 10px
+  h2
+    text-align: center
+  &:last-child
+    border-bottom: 0
+    margin-bottom: 0
+
+
+#graph, #empty-message
+  height: 100%
+  width: 70%
+
+#empty-message
+  display: flex
+  align-items: center
+
+  p
+    text-align: center
+    font-weight: bold
+    font-size: 24px
+    width: 100%
+
+[hidden]
+  display: none !important
+
+#raw
+  height: 100%
+  width: 30%
+  font-family: monospace
+  border: 1px solid black
+  overflow: scroll
+  background-color: rgb(51, 51, 51)
+  color: white
+
+.graph-selector
+  display: flex
+  justify-content: space-evenly
+  padding-top: 20px
+  padding-bottom: 10px
+
+ul.raw-log
+  list-style: none
+  font-size: smaller
+  padding-left: 5px
+  margin-top: 2px

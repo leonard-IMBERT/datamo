@@ -6,12 +6,17 @@
   "scripts": {
     "start": "node server.js",
     "build": "node_modules/.bin/parcel build",
+    "watch": "node_modules/.bin/parcel watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "targets": {
     "frontend": {
       "source": "src/front/index.ts",
       "distDir": "src/front/dist"
+    },
+    "pretty": {
+      "source": "src/front/index.sass",
+      "distDir": "src/front"
     }
   },
   "repository": {
@@ -21,14 +26,18 @@
   "author": "Leonard Imbert <imbert@subatech.in2p3.fr>",
   "license": "ISC",
   "dependencies": {
+    "@material/menu": "^14.0.0",
+    "@material/theme": "^14.0.0",
     "argparse": "^2.0.1",
     "express": "^4.18.1",
+    "material-components-web": "^14.0.0",
     "mathjs": "^10.6.1",
-    "plotly.js": "^2.12.1",
+    "plotly.js-dist-min": "^2.14.0",
     "ws": "^8.8.0"
   },
   "devDependencies": {
-    "@types/plotly.js": "^1.54.22",
+    "@parcel/transformer-sass": "^2.7.0",
+    "@types/plotly.js-dist-min": "^2.3.0",
     "parcel": "^2.6.0"
   }
 }

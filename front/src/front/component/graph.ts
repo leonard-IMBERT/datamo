@@ -1,5 +1,6 @@
-import { Context, DataMoStringToDate, isArrayOf, isTensorDesc, ReadableType, TensorDesc } from "../utils";
-import Plotly from 'plotly.js/dist/plotly'
+import { Context, DataMoStringToDate, isArrayOf, isNumberArray, isTensorDesc, ReadableType, TensorDesc } from "../utils";
+import * as Plotly from 'plotly.js-dist-min'
+import { Tensor } from '../../../../js/DataMoReader'
 import { reshape } from 'mathjs'
 
 export enum GraphMode {
@@ -83,13 +84,11 @@ export class GraphManager {
 
   }
 
-  resetChart() {
-    while(this.chart && this.chart.data.length > 0) {
-      Plotly.deleteTraces(this.chartElement, 0)
-    }
+  async resetChart() {
+    this.chart = await Plotly.newPlot(this.chartElement, [])
   }
 
-  updateGraph(option: { new_project?: string, new_value?: string, new_mode?:GraphMode }) {
+  async updateGraph(option: { new_project?: string, new_value?: string, new_mode?:GraphMode }) {
     if(this.ctx.data == null ) { console.warn("Trying to update the graph without data"); return; }
 
     if(
@@ -120,38 +119,39 @@ export class GraphManager {
 
         this.resetChart()
 
-        const data: Array<number | TensorDesc>  = this.ctx.data[project][value].data.map(_ => _[1])
-        const time: Array<Date> = this.ctx.data[project][value].data.map(x => x[0])
+        const time: Array<Date> = this.ctx.data[project][value].data.map(_ => _[0])
           .map(DataMoStringToDate)
 
         switch(this.ctx.data[project][value].type) {
           case ReadableType.SCALAR:
+            const datas: number[] = this.ctx.data[project][value].data.map(_ => _[1])
             this.buttons.forEach((button) => button.hidden = !(button.value === GraphMode.HIST || button.value === GraphMode.PLOT))
             this.mode = GraphMode.PLOT
 
-            Plotly.addTraces(this.chartElement, {
+            await Plotly.addTraces(this.chartElement, {
               text: time.map((_ : Date) => _.toISOString()),
-              y: this.ctx.data[project][value].data.map(x => x[1]),
+              y: datas,
               type: 'scatter'
             })
 
             break;
           case ReadableType.TENSOR:
+            const datat: Tensor[] = this.ctx.data[project][value].data.map(_ => _[1])
             this.buttons.forEach((button) => button.hidden = !(button.value === GraphMode.TENSOR_WEIGHT))
             this.mode = GraphMode.TENSOR_WEIGHT
 
-            if(!isArrayOf(data, isTensorDesc)) { throw new Error("Corrupted data") }
+            if(!isArrayOf(datat, isTensorDesc)) { throw new Error("Corrupted data") }
 
-            Plotly.addTraces(this.chartElement, {
-              z: tensorToHeatmap(data[data.length - 1]),
+            await Plotly.addTraces(this.chartElement, {
+              z: tensorToHeatmap(datat[datat.length - 1]),
               type: 'heatmap'
             })
 
             break;
         }
 
-        Plotly.relayout(this.chartElement, { title: `${project} : ${value}` })
-        this.currentSelection.current_index = data.length
+        await Plotly.relayout(this.chartElement, { title: `${project} : ${value}` })
+        this.currentSelection.current_index = this.ctx.data[project][value].data.length
 
 
         } else {
@@ -176,8 +176,8 @@ export class GraphManager {
         return
       }
 
-      const data : Array<number | TensorDesc> = this.ctx.data[project][value].data.map(x => x[1])
-      const time : Array<Date> = this.ctx.data[project][value].data.map(x => x[0])
+      const data = this.ctx.data[project][value].data.map((x: [string, number] | [string, Tensor]) => x[1])
+      const time : Array<Date> = this.ctx.data[project][value].data.map<string>(x => x[0])
         .map(DataMoStringToDate)
 
       this.resetChart()
@@ -186,7 +186,7 @@ export class GraphManager {
 
       switch(this.mode) {
         case GraphMode.PLOT:
-          Plotly.addTraces(this.chartElement, {
+          await Plotly.addTraces(this.chartElement, {
             text: time.map((_ : Date) => _.toISOString()),
             y: this.ctx.data[project][value].data.map(x => x[1]),
             type: 'scatter'
@@ -194,7 +194,8 @@ export class GraphManager {
 
           break;
         case GraphMode.HIST:
-          Plotly.addTraces(this.chartElement, {
+          const data = this.ctx.data[project][value].data.map<number>((x) => x[1])
+          await Plotly.addTraces(this.chartElement, {
             type: 'histogram',
             x: data,
           })
@@ -203,7 +204,7 @@ export class GraphManager {
 
         case GraphMode.TENSOR_WEIGHT:
           if(isArrayOf(data, isTensorDesc)) {
-            Plotly.addTraces(this.chartElement, {
+            await Plotly.addTraces(this.chartElement, {
               z: tensorToHeatmap(data[data.length - 1]),
               type: 'heatmap'
             })
@@ -229,19 +230,22 @@ export class GraphManager {
 
       switch(this.mode) {
         case GraphMode.HIST:
-          Plotly.extendTraces(this.chartElement, {
-            x: [data.slice(this.currentSelection.current_index)],
-          }, [0])
+          if(isNumberArray(data)) {
+            await Plotly.extendTraces(this.chartElement, {
+              x: [data.slice(this.currentSelection.current_index)],
+            }, [0])
+          }
           break
         case GraphMode.PLOT:
-          Plotly.extendTraces(this.chartElement, {
-            y:    [data.slice(this.currentSelection.current_index)],
-            text: [time.slice(this.currentSelection.current_index).map(_ => _.toISOString())]
-          }, [0])
+          if(isNumberArray(data)) {
+            await Plotly.extendTraces(this.chartElement, {
+              y:    [data.slice(this.currentSelection.current_index)],
+              text: time.slice(this.currentSelection.current_index).map(_ => _.toISOString())
+            }, [0])
+          }
           break
         case GraphMode.TENSOR_WEIGHT:
           this.resetChart()
-
           if(isArrayOf(data, isTensorDesc)) {
             Plotly.addTraces(this.chartElement, {
               z: tensorToHeatmap(data[data.length - 1]),
