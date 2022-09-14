@@ -5,7 +5,7 @@ const fs = require('fs');
  * @readonly
  * @enum {number}
  */
-const ReadeableType = {
+const ReadableType = {
   // Monitoring
   SCALAR: 0, /**< A simple scalar */
   TENSOR: 1, /**< A tensor */
@@ -54,7 +54,7 @@ function readTensorFromBuffer(buffer) {
 /**
  * @typedef {number} Scalar
  * @typedef {{order: number, dims: number[], raw_data: number[]}}  Tensor
- * @typedef {{ type: number, data: Array<[string, Scalar|Tensor]>}} Values
+ * @typedef {{ type: number, data: Array<[string, Scalar|Tensor|string]>}} Values
  * @typedef {Object.<string, Values>} Project
  * @typedef {Object.<string, Project>} ProjectHolder
  */
@@ -200,7 +200,7 @@ class DataMoReader {
     const type = header.subarray(30, 32).readInt16LE();
     const entry_name = header.subarray(32, 32 + 24).toString('utf-8', 0, 23).trim();
 
-    if(type == ReadeableType.META_PROJECT) {
+    if(type == ReadableType.META_PROJECT) {
       this.selected = entry_name;
       if(this.events[this.selected] == null) {
         this.events[this.selected] = {}
@@ -218,9 +218,9 @@ class DataMoReader {
 
     let parsed_data;
     switch (type) {
-      case ReadeableType.SCALAR: parsed_data = data.readDoubleLE(); break;
-      case ReadeableType.TENSOR: parsed_data = readTensorFromBuffer(data); break;
-      case ReadeableType.STRING: parsed_data = data.toString(); break;
+      case ReadableType.SCALAR: parsed_data = data.readDoubleLE(); break;
+      case ReadableType.TENSOR: parsed_data = readTensorFromBuffer(data); break;
+      case ReadableType.STRING: parsed_data = data.toString(); break;
       default: console.error(`Data type ${type} is unknown`); parsed_data = undefined;
     }
 
@@ -233,5 +233,5 @@ class DataMoReader {
 
 module.exports = {
   DataMoReader,
-  ReadeableType
+  ReadableType
 };

@@ -6,7 +6,7 @@ export type Tensor = {
 };
 export type Values = {
     type: number;
-    data: Array<[string, Scalar]> | Array<[string, Tensor]>;
+    data: Array<[string, Scalar | Tensor | string]>;
 };
 export type Project = {
     [x: string]: Values;
@@ -17,7 +17,7 @@ export type ProjectHolder = {
 /**
  * @typedef {number} Scalar
  * @typedef {{order: number, dims: number[], raw_data: number[]}}  Tensor
- * @typedef {{ type: number, data: Array<[string, Scalar|Tensor]>}} Values
+ * @typedef {{ type: number, data: Array<[string, Scalar|Tensor|string]>}} Values
  * @typedef {Object.<string, Values>} Project
  * @typedef {Object.<string, Project>} ProjectHolder
  */
@@ -43,7 +43,14 @@ export class DataMoReader {
     reading: boolean;
     /** @type {((project: string, value: string) => void)?} */
     on_new_data_f: (project: string, value: string) => void;
-
+    /**
+     * @type {Buffer?}
+     */
+    current_header: Buffer;
+    /**
+     * @type {Buffer?}
+     */
+    current_data: Buffer;
     /**
      * Read the file synchronously
      */
@@ -87,4 +94,5 @@ export namespace ReadeableType {
     const SCALAR: number;
     const TENSOR: number;
     const META_PROJECT: number;
+    const STRING: number;
 }
