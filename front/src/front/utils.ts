@@ -3,6 +3,7 @@ import { ProjectHolder } from '../../../js/DataMoReader'
 export const ReadableType = {
   SCALAR:0,
   TENSOR: 1,
+  STRING: 3,
 }
 
 export class Context {

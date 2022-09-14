@@ -1,5 +1,6 @@
 import { GraphManager, GraphMode } from "./component/graph";
 import { RawManager } from "./component/raw";
+import { StatusManager } from "./component/status";
 import { ReadableType, Context } from "./utils";
 
 // Crawl the html
@@ -11,6 +12,9 @@ const value = document.getElementById('value');
 
 const graph = document.getElementById('graph');
 const raw = document.getElementById('raw');
+
+const status = document.querySelector<HTMLSpanElement>('#status span');
+const status_text = document.querySelector<HTMLSpanElement>('#status span .text');
 
 const emptyMessage = document.getElementById('empty-message');
 
@@ -34,6 +38,7 @@ ctx.data = cache;
 
 const gManager = new GraphManager(graph, ctx);
 const rManager = new RawManager(raw, ctx)
+const sManager = new StatusManager(status, status_text, ctx);
 
 let socket: WebSocket | undefined = undefined
 
@@ -56,11 +61,13 @@ fetch('/config/', { method: 'GET' }).then(_ => _.json()).then((obj) => {
       }
       gManager.updateGraph({ new_project: ctx.project, new_value: ctx.value })
       rManager.updateRaw({ new_project: ctx.project, new_value: ctx.value })
+      sManager.updateStatus();
     } else if (Object.keys(reicv_obj).find(_ => _ === 'new_data')) {
       // new data event
       cache[reicv_obj.project][reicv_obj.value].data.push(reicv_obj.new_data)
       gManager.updateGraph({})
       rManager.updateRaw({})
+      sManager.updateStatus();
     }
   })
 }).catch(console.error)
@@ -122,6 +129,7 @@ value.addEventListener('change', () => {
 
     gManager.updateGraph({new_project: project.value, new_value: value.value});
     rManager.updateRaw({new_project: project.value, new_value: value.value});
+    sManager.updateStatus();
 
     graph.hidden = false;
     emptyMessage.hidden = true;
