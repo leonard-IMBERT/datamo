@@ -1,11 +1,12 @@
-from enum import Enum
-from os import path
-import torch
-import tensorflow as tf
-import numpy as np
-from typing import Any
 from datetime import datetime
+from enum import Enum
 from math import floor
+from os import path
+from typing import Any
+import numpy as np
+import struct
+import tensorflow as tf
+import torch
 
 class WritableType(Enum):
   """The different writable type known
@@ -45,7 +46,7 @@ class Item():
 class ScalarItem(Item):
   """An item holding a Scala"""
   def __init__(self, name: str, data: float):
-    super().__init__(name, WritableType.SCALAR, 8, float(data)) # Scalar are stored as float
+    super().__init__(name, WritableType.SCALAR, 8, struct.pack('d', float(data))) # Scalar are stored as float
 
 class TensorItem(Item):
   """An item holding a tensor
