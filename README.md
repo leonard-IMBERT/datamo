@@ -64,6 +64,8 @@ Log a `string`
 | utf8 encoded string |
 
 ## Changelog
+ - `0.4.2`
+   - Fix a bug in the reading of tensors
  - `0.4.0`
    - Spec goes from `v0.1` to `v0.2`
      - Add the String entry

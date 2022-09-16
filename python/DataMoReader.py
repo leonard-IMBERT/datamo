@@ -51,9 +51,9 @@ def readTensorFromBuffer(buffer: bytes) -> Tuple[int, list, list]:
   dims = []
 
   while len(dims) < order:
-    dim = int.from_bytes(buffer[cursor:cursor + 4], 'little')
+    dim = int.from_bytes(buffer[cursor:cursor + 8], 'little')
     dims.append(dim)
-    cursor += 4
+    cursor += 8
 
     n_entries = n_entries * dim
 
