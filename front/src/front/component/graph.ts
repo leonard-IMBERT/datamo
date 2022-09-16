@@ -240,7 +240,7 @@ export class GraphManager {
           if(isNumberArray(data)) {
             await Plotly.extendTraces(this.chartElement, {
               y:    [data.slice(this.currentSelection.current_index)],
-              text: time.slice(this.currentSelection.current_index).map(_ => _.toISOString())
+              text: [time.slice(this.currentSelection.current_index).map(_ => _.toISOString())]
             }, [0])
           }
           break
