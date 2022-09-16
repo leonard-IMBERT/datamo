@@ -30,9 +30,9 @@ function readTensorFromBuffer(buffer) {
   let n_entries = 1;
   const dims = [];
   while(dims.length < order) {
-    const dim = buffer.subarray(cursor, cursor + 8).readInt32LE();
+    const dim = buffer.subarray(cursor, cursor + 4).readInt32LE();
     dims.push(dim);
-    cursor += 8;
+    cursor += 4;
 
     n_entries = n_entries * dim;
   }
