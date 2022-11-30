@@ -76,11 +76,13 @@ void Writer::write_data(Item *data) {
   if (data->type == TENSOR) {
     // special case for the tensor, needs to write the dimensions also
     TensorItem *dataT = (TensorItem *)data;
-    _out_stream.write(reinterpret_cast<char *>(dataT->order_dims),
-                      dataT->order_dims_size * sizeof(int32_t));
+    _out_stream.write(
+        reinterpret_cast<char *>(dataT->order_dims),
+        (std::streamsize)(dataT->order_dims_size * sizeof(int32_t)));
   }
 
-  _out_stream.write(reinterpret_cast<const char *>(data->data_pointer), data->size);
+  _out_stream.write(reinterpret_cast<const char *>(data->data_pointer),
+                    (std::streamsize)data->size);
 
   _out_stream.flush();
 

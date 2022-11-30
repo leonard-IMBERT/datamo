@@ -83,13 +83,13 @@ struct TensorItem : public Item {
   /**
    * @brief Pointer to the order and dims data
    */
-  int32_t* order_dims;
+  size_t* order_dims;
 
   /**
    * @brief
    *
    */
-  int order_dims_size;
+  size_t order_dims_size;
 
   /**
    * @brief Construct a new Tensor Item object
@@ -104,16 +104,16 @@ struct TensorItem : public Item {
 
     data_pointer = data.data_ptr<double>();
 
-    int32_t orders = d.sizes().size();
+    size_t orders = d.sizes().size();
 
     order_dims_size = orders + 1;
-    order_dims = new int32_t[orders + 1];
+    order_dims = new size_t[orders + 1];
     order_dims[0] = orders;
 
     size = 1;
-    for (unsigned int order = 0; order < orders; order++) {
-      order_dims[order + 1] = d.size(order);
-      size = size * d.size(order);
+    for (size_t order = 0; order < orders; order++) {
+      order_dims[order + 1] = (size_t)d.size((int64_t)order);
+      size = size * (size_t)d.size((int64_t)order);
     }
 
     // Take care here. The size of the writed tensor depends on the

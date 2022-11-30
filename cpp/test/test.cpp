@@ -6,7 +6,7 @@
 using u32 = uint_least32_t;
 using engine = std::mt19937;
 
-int main(int argc, char* args[]) {
+int main(int, char**) {
   std::random_device os_seed;
   const u32 seed = os_seed();
 
