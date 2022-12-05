@@ -202,6 +202,7 @@ class DataMoReader {
 
     if(type == ReadableType.META_PROJECT) {
       this.selected = entry_name;
+      console.log(`Parsing project ${entry_name}`);
       if(this.events[this.selected] == null) {
         this.events[this.selected] = {}
       }
