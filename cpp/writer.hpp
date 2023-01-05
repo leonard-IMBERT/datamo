@@ -83,7 +83,7 @@ struct TensorItem : public Item {
   /**
    * @brief Pointer to the order and dims data
    */
-  size_t* order_dims;
+  int32_t * order_dims;
 
   /**
    * @brief
@@ -107,7 +107,7 @@ struct TensorItem : public Item {
     size_t orders = d.sizes().size();
 
     order_dims_size = orders + 1;
-    order_dims = new size_t[orders + 1];
+    order_dims = new int32_t[orders + 1];
     order_dims[0] = orders;
 
     size = 1;
