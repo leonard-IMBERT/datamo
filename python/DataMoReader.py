@@ -1,6 +1,6 @@
 import os.path as path
 from enum import Enum
-from typing import Callable, Union, Tuple
+from typing import Callable, Dict, Union, Tuple
 import struct
 import asyncio
 
@@ -84,7 +84,7 @@ class DataMoReader:
     """
     self.file = file
 
-    self.events = dict()
+    self.events : Dict[str, Dict[str, Entry]] = dict()
     self.events['default'] = dict()
 
     self.on_new_data_f: Union[Callable[[str, str], None], None] = None

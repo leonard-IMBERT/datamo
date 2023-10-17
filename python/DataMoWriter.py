@@ -5,8 +5,18 @@ from os import path
 from typing import Any
 import numpy as np
 import struct
-import tensorflow as tf
-import torch
+
+from importlib import import_module
+
+try:
+  torch = import_module("torch")
+except ModuleNotFoundError:
+  torch = None
+
+try:
+  tf = import_module("tensorflow")
+except ModuleNotFoundError:
+  tf = None
 
 class WritableType(Enum):
   """The different writable type known
@@ -53,11 +63,11 @@ class TensorItem(Item):
      Support pytorch and tensorflow tensors
   """
   def __init__(self, name: str, data):
-    if isinstance(data, torch.Tensor):
+    if torch is not None and isinstance(data, torch.Tensor):
       raw_data = data.clone().detach().cpu().to(torch.float64).contiguous().numpy()
       self.dims = data.size()
       self.order = len(self.dims)
-    elif isinstance(data, tf.Tensor):
+    elif tf is not None and isinstance(data, tf.Tensor):
       raw_data = data.numpy()
       self.dims = np.array(data.shape)
       self.order = len(self.dims)
